@@ -18,7 +18,7 @@ struct GrassApp: App {
             if avPlayerViewModel.isPlaying {
                 AVPlayerView(viewModel: avPlayerViewModel)
             } else {
-                ContentView()
+                GrassPlaneView()
                     .environment(appModel)
             }
         }
