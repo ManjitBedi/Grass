@@ -1,0 +1,65 @@
+graph LR
+%% Custom Input Parameters
+TIME[Custom Input: time<br/>Type: Float]
+WIND[Custom Input: windStrength<br/>Type: Float]
+
+%% Geometry Inputs
+POS[Position Node<br/>Space: Model<br/>Output: Vector3]
+UV[UV0 Node<br/>Output: Vector2]
+
+%% Constants
+C1[Constant: 2.0]
+C2[Constant: 0.3]
+C3[Constant: 0.2]
+
+%% Wind Phase Calculation
+TIME --> MULT1[Multiply]
+C1 --> MULT1
+
+POS --> SPLIT1[Split X,Y,Z]
+SPLIT1 -->|X| MULT2[Multiply]
+C2 --> MULT2
+
+SPLIT1 -->|Z| MULT3[Multiply]
+C3 --> MULT3
+
+MULT1 --> ADD1[Add]
+MULT2 --> ADD1
+
+ADD1 --> ADD2[Add]
+MULT3 --> ADD2
+
+ADD2 --> SIN[Sin Function]
+
+%% Wind Strength
+SIN --> MULT4[Multiply]
+WIND --> MULT4
+
+%% Height-based bending (quadratic)
+UV --> SPLIT2[Split U,V]
+SPLIT2 -->|V| MULT5[Multiply<br/>Square UV.y]
+SPLIT2 -->|V| MULT5
+
+MULT5 --> MULT6[Multiply]
+MULT4 --> MULT6
+
+%% Create offset vector
+MULT6 --> COMBINE[Combine Vector3<br/>X: bendAmount<br/>Y: 0<br/>Z: 0]
+
+%% Add offset to original position
+POS --> ADD3[Add]
+COMBINE --> ADD3
+
+%% Output
+ADD3 --> OUTPUT[Output:<br/>Model Position Offset<br/>Geometry Modifier]
+
+%% Styling
+classDef input fill:#e1f5ff,stroke:#0066cc,stroke-width:2px
+classDef output fill:#fff3e1,stroke:#ff9900,stroke-width:2px
+classDef operation fill:#f0f0f0,stroke:#666,stroke-width:1px
+classDef constant fill:#ffe1f5,stroke:#cc0066,stroke-width:1px
+
+class TIME,WIND,POS,UV input
+class OUTPUT output
+class MULT1,MULT2,MULT3,MULT4,MULT5,MULT6,ADD1,ADD2,ADD3,SIN,COMBINE,SPLIT1,SPLIT2 operation
+class C1,C2,C3 constant
